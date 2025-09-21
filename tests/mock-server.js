@@ -196,8 +196,6 @@ app.post('/v1/test/image-process', (req, res) => {
     inputType = 'data_url';
   } else if (/^https?:\/\/.+/i.test(image_url)) {
     inputType = 'http_url';
-  } else if (/^[A-Za-z0-9\/+=]*$/.test(image_url)) {
-    inputType = 'raw_base64';
   } else {
     inputType = 'file_path';
   }

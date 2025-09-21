@@ -5,10 +5,9 @@ import path from 'path';
 
 describe('Image Processing Tests', () => {
   // Test image data for different input types
-  const testImagePath = path.join(__dirname, '../test_image.webp');
+  const testImagePath = path.join(__dirname, '../test.svg');
   const testDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-  const testBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-  const testImageUrl = 'https://example.com/image.jpg';
+  const testImageUrl = 'https://picsum.photos/200';
 
   // Clean up after tests
   afterEach(async () => {
@@ -24,12 +23,6 @@ describe('Image Processing Tests', () => {
 
     it('should validate data URL input correctly', () => {
       const validation = ImageProcessor.validateImageInput(testDataUrl);
-      expect(validation.isValid).toBe(true);
-      expect(validation.errors).toHaveLength(0);
-    });
-
-    it('should validate raw base64 input correctly', () => {
-      const validation = ImageProcessor.validateImageInput(testBase64);
       expect(validation.isValid).toBe(true);
       expect(validation.errors).toHaveLength(0);
     });
@@ -66,8 +59,8 @@ describe('Image Processing Tests', () => {
 
     it('should reject invalid base64 format', () => {
       const validation = ImageProcessor.validateImageInput('invalid_base64!@#$');
-      expect(validation.isValid).toBe(true); // This is expected because the validation is lenient
-      expect(validation.errors).toHaveLength(0);
+      expect(validation.isValid).toBe(false);
+      expect(validation.errors).toContain('Unsupported image input format. Supported formats: file paths, HTTP/HTTPS URLs, and data URLs with base64 encoding.');
     });
   });
 
@@ -82,25 +75,16 @@ describe('Image Processing Tests', () => {
       
       expect(result).toBeDefined();
       expect(result.url).toMatch(/^data:image\/[^;]+;base64,/);
-      expect(result.mimeType).toMatch(/^image\/\w+$/);
+      expect(result.mimeType).toMatch(/^image\/[\w+]+$/);
       expect(result.size).toBeGreaterThan(0);
     });
 
     it('should process data URL input and pass through', async () => {
       const result = await ImageProcessor.processImage(testDataUrl);
-      
+
       expect(result).toBeDefined();
       expect(result.url).toBe(testDataUrl);
       expect(result.mimeType).toBe('image/png');
-      expect(result.size).toBeGreaterThan(0);
-    });
-
-    it('should process raw base64 input and pass through', async () => {
-      const result = await ImageProcessor.processImage(testBase64);
-      
-      expect(result).toBeDefined();
-      expect(result.url).toMatch(/^data:image\/jpeg;base64,/);
-      expect(result.mimeType).toBe('image/jpeg');
       expect(result.size).toBeGreaterThan(0);
     });
 
@@ -149,18 +133,25 @@ describe('Image Processing Tests', () => {
 
     it('should handle invalid base64 error', async () => {
       const invalidBase64 = 'invalid_base64!@#$';
-      
+
       await expect(ImageProcessor.processImage(invalidBase64))
         .rejects
-        .toThrow('Failed to process base64 input');
+        .toThrow('Unsupported image input format');
     });
 
     it('should handle invalid URL error', async () => {
       const invalidUrl = 'https://example.com/invalid-url';
-      
-      await expect(ImageProcessor.processImage(invalidUrl))
-        .rejects
-        .toThrow('Failed to process URL input');
+
+      // Mock axios to simulate a network error
+      jest.spyOn(require('axios'), 'get').mockRejectedValueOnce(new Error('Network Error'));
+
+      try {
+        await expect(ImageProcessor.processImage(invalidUrl))
+          .rejects
+          .toThrow('Failed to process URL input');
+      } finally {
+        jest.restoreAllMocks();
+      }
     });
   });
 
@@ -209,6 +200,52 @@ describe('Image Processing Tests', () => {
       expect(ImageProcessor['isFileInput']('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')).toBe(false);
     });
   });
+
+  describe('ImageProcessor compare_images functionality', () => {
+    const localTestDataUrl1 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    const localTestDataUrl2 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/vAA=';
+    const localTestImageUrl = 'https://picsum.photos/200';
+
+    it('should support processing multiple images for comparison', async () => {
+      // Test that ImageProcessor can handle multiple images (used by compare_images tool)
+      const testImages = [
+        localTestDataUrl1,
+        localTestDataUrl2
+      ];
+
+      // Process multiple images
+      const results = await Promise.all(
+        testImages.map(image => ImageProcessor.processImage(image))
+      );
+
+      // Verify all images were processed successfully
+      expect(results).toHaveLength(2);
+      results.forEach(result => {
+        expect(result).toBeDefined();
+        expect(result.url).toMatch(/^data:image\/[^;]+;base64,/);
+        expect(result.mimeType).toMatch(/^image\/\w+$/);
+        expect(result.size).toBeGreaterThan(0);
+      });
+    });
+
+    it('should validate multiple image inputs for comparison', () => {
+      // Test validation for multiple images (used by compare_images tool)
+      const validImages = [localTestDataUrl1, localTestDataUrl2, localTestImageUrl];
+      const invalidImages = ['', null, undefined];
+
+      // Valid images should pass validation
+      validImages.forEach(image => {
+        const validation = ImageProcessor.validateImageInput(image);
+        expect(validation.isValid).toBe(true);
+      });
+
+      // Invalid images should fail validation
+      invalidImages.forEach(image => {
+        const validation = ImageProcessor.validateImageInput(image as any);
+        expect(validation.isValid).toBe(false);
+      });
+    });
+  });
 });
 
 // Simple test to verify the project structure
@@ -252,8 +289,7 @@ describe('Project Structure Tests', () => {
   it('should have documentation', () => {
     const fs = require('fs');
     const path = require('path');
-    
+
     expect(fs.existsSync(path.join(__dirname, '../README.md'))).toBe(true);
-    expect(fs.existsSync(path.join(__dirname, '../create-test-image.js'))).toBe(true);
   });
 });

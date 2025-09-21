@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Placeholder image background -->
+  <rect x="50" y="50" width="412" height="312" fill="#e0e0e0" stroke="#ccc" stroke-width="2"/>
+  <!-- Placeholder image icon (simple camera) -->
+  <circle cx="256" cy="206" r="40" fill="#999"/>
+  <rect x="236" y="186" width="40" height="20" fill="#999"/>
+  <circle cx="246" cy="196" r="5" fill="#666"/>
+  <circle cx="266" cy="196" r="5" fill="#666"/>
+  <rect x="244" y="210" width="24" height="12" fill="#666"/>
+
+  <!-- Magnifying glass -->
+  <circle cx="350" cy="150" r="60" fill="none" stroke="#333" stroke-width="8"/>
+  <line x1="380" y1="180" x2="420" y2="220" stroke="#333" stroke-width="8"/>
+  <circle cx="350" cy="150" r="30" fill="none" stroke="#333" stroke-width="4"/>
+
+  <!-- Text -->
+  <text x="256" y="450" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="#333">image_mcp</text>
+</svg>

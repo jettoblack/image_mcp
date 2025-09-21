@@ -54,8 +54,8 @@ export class ImageProcessor {
     let imageInfo: ImageInfo;
 
     // Determine input type and process accordingly
-    if (processedInput.includes('BASE64')) {
-      // Pass through as-is
+    if (processedInput.startsWith('data:image/') && processedInput.includes('base64')) {
+      // Data URL with base64
       imageInfo = await this.processBase64Input(processedInput);
     } else if (/^https?:\/\/.+/i.test(processedInput)) {
       // HTTP/HTTPS URL - download the image
@@ -64,8 +64,7 @@ export class ImageProcessor {
       // File path
       imageInfo = await this.processFileInput(processedInput);
     } else {
-      // Data URL or raw base64
-      imageInfo = await this.processBase64Input(processedInput);
+      throw new Error('Unsupported image input format. Supported formats: file paths, HTTP/HTTPS URLs, and data URLs with base64 encoding.');
     }
 
     // Validate image
@@ -99,11 +98,6 @@ export class ImageProcessor {
     // Check for data URLs with base64
     if (input.startsWith('data:image/') && input.includes('base64')) {
       return false; // It's a data URL
-    }
-
-    // Check for raw base64 without header
-    if (/^[A-Za-z0-9\/+=]*$/.test(input)) {
-      return false; // It's raw base64
     }
 
     // Check for path-like patterns
@@ -346,6 +340,20 @@ export class ImageProcessor {
   }
 
   /**
+   * Get supported MIME types
+   */
+  static getSupportedMimeTypes(): string[] {
+    return [...this.SUPPORTED_MIME_TYPES];
+  }
+
+  /**
+   * Get maximum file size in bytes
+   */
+  static getMaxFileSize(): number {
+    return this.MAX_FILE_SIZE;
+  }
+
+  /**
    * Validate image input schema
    */
   static validateImageInput(imageInput: string): { isValid: boolean; errors: string[] } {
@@ -375,9 +383,11 @@ export class ImageProcessor {
       if (!urlPattern.test(imageInput)) {
         errors.push('Invalid image URL format. Supported formats: jpg, jpeg, png, gif, webp, bmp, tiff');
       }
-    } else if (!imageInput.includes('base64') && !imageInput.match(/^[A-Za-z0-9\/+=]*$/)) {
-      // Check if it looks like base64
-      errors.push('Base64 input should contain "base64" or be valid base64 characters');
+    } else if (imageInput.startsWith('data:image/') && imageInput.includes('base64')) {
+      // Data URL validation - this is valid
+    } else {
+      // Unsupported input format
+      errors.push('Unsupported image input format. Supported formats: file paths, HTTP/HTTPS URLs, and data URLs with base64 encoding.');
     }
 
     return {
