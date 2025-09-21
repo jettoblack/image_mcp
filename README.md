@@ -19,6 +19,33 @@ For local models, gemma3:4b-it-qat works quite well with a relatively small foot
 - Comprehensive error handling
 - TypeScript support
 
+## Quick install from NPM
+
+Add this to your global `mcp_settings.json` or project `mcp.json`:
+
+```json
+  "image_summarization": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@jettoblack/image_mcp",
+      "--api-key",
+      "key",
+      "--base-url",
+      "http://localhost:8080/v1",
+      "--model",
+      "gemma3:4b-it-qat",
+      "--timeout",
+      "120000",
+      "--max-retries",
+      "3"
+    ],
+    "timeout": 300
+  }
+```
+
+Replace the base url, API key, model, etc. as required.
+
 ## Configuration
 
 The MCP server can be configured using environment variables, command-line arguments, or defaults.
@@ -34,7 +61,7 @@ The MCP server can be configured using environment variables, command-line argum
 ### Command Line Arguments
 
 ```bash
-node build/index.js \
+npx -y @jettoblack/image_mcp \
   --api-key your-api-key \
   --base-url https://api.openai.com/v1 \
   --model gpt-4-vision-preview \
@@ -73,28 +100,28 @@ node build/index.js
 
 The server will start and listen on stdio for MCP protocol communications.
 
-## MCP Tool Installation (local build)
+### MCP Tool Installation (local build)
 
 Add this to your global mcp_settings.json or project mcp.json:
 
 ```json
-"image_summarizer": {
-  "command": "node",
-  "args": [
-    "/path/to/image_mcp/build/index.js",
-    "--api-key",
-    "key",
-    "--base-url",
-    "http://localhost:9292/v1",
-    "--model",
-    "gemma3:4b-it-qat",
-    "--timeout",
-    "120000",
-    "--max-retries",
-    "3"
-  ],
-  "timeout": 300,
-}
+  "image_summarizer": {
+    "command": "node",
+    "args": [
+      "/path/to/image_mcp/build/index.js",
+      "--api-key",
+      "key",
+      "--base-url",
+      "http://localhost:9292/v1",
+      "--model",
+      "gemma3:4b-it-qat",
+      "--timeout",
+      "120000",
+      "--max-retries",
+      "3"
+    ],
+    "timeout": 300,
+  }
 ```
 
 ## Usage
@@ -386,3 +413,12 @@ This project is licensed under the MIT License.
 ## Support
 
 For issues and questions, please open an issue on the GitHub repository.
+
+## Tips
+
+Tips / donations always appreciated to help fund future development.
+
+* PayPal: [paypal.me/jettoblack](https://paypal.me/jettoblack)
+* Venmo: [venmo.com/u/jettoblack](https://venmo.com/u/jettoblack)
+* BTC: bc1qa76jrsvyglxq7t5fxnvfkekjtmp4z82wtm6ywf
+* ETH: 0x47fc11F09A427540d10a45491d464F02177EAc66

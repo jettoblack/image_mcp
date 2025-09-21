@@ -35,7 +35,7 @@ export class ConfigManager {
     
     // Set up command line arguments
     program
-      .name('image-summarization-mcp')
+      .name('@jettoblack/image_mcp')
       .description('MCP server for image summarization')
       .version('1.0.0');
 

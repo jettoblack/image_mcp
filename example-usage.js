@@ -51,7 +51,7 @@ const TEST_MESSAGES = [
         resources: {}
       },
       serverInfo: {
-        name: 'image-summarization-mcp',
+        name: '@jettoblack/image_mcp',
         version: '1.0.0'
       }
     }

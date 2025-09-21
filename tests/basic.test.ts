@@ -253,7 +253,7 @@ describe('Project Structure Tests', () => {
   it('should have package.json with correct dependencies', () => {
     const packageJson = require('../package.json');
     
-    expect(packageJson.name).toBe('image-summarization-mcp');
+    expect(packageJson.name).toBe('@jettoblack/image_mcp');
     expect(packageJson.version).toBe('1.0.0');
     expect(packageJson.main).toBe('build/index.js');
     expect(packageJson.scripts).toHaveProperty('build');

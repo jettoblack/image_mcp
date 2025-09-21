@@ -28,7 +28,7 @@ const openaiClient = new OpenAIClient(
 // Create MCP server
 const server = new Server(
   {
-    name: 'image-summarization-mcp',
+    name: '@jettoblack/image_mcp',
     version: '1.0.0',
   },
   {
