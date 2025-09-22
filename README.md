@@ -17,7 +17,6 @@ For local models, gemma3:4b-it-qat works quite well with a relatively small foot
 - Configurable endpoint URL, API key, and model
 - Command-line interface for configuration
 - Comprehensive error handling
-- TypeScript support
 
 ## Quick install from NPM
 
@@ -34,21 +33,18 @@ Add this to your global `mcp_settings.json` or project `mcp.json`:
       "--base-url",
       "http://localhost:8080/v1",
       "--model",
-      "gemma3:4b-it-qat",
-      "--timeout",
-      "120000",
-      "--max-retries",
-      "3"
-    ],
-    "timeout": 300
+      "gemma3:4b-it-qat"
+    ]
   }
 ```
 
-Replace the base url, API key, model, etc. as required.
+At a minimum, configure the base url, API key, and model to point to your choice of server.
+
+For use with slow local models, you may need to also increase the timeout and max retries settings.
 
 ## Configuration
 
-The MCP server can be configured using environment variables, command-line arguments, or defaults.
+The MCP server can be configured using environment variables or command-line arguments.
 
 ### Environment Variables
 
@@ -74,55 +70,6 @@ npx -y @jettoblack/image_mcp \
 1. Command-line arguments
 2. Environment variables
 3. Default values
-
-## Dev Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/jettoblack/image_mcp.git
-cd image_mcp
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Build the project:
-```bash
-npm run build
-```
-
-4. Starting the Server
-```bash
-node build/index.js
-```
-
-The server will start and listen on stdio for MCP protocol communications.
-
-### MCP Tool Installation (local build)
-
-Add this to your global mcp_settings.json or project mcp.json:
-
-```json
-  "image_summarizer": {
-    "command": "node",
-    "args": [
-      "/path/to/image_mcp/build/index.js",
-      "--api-key",
-      "key",
-      "--base-url",
-      "http://localhost:9292/v1",
-      "--model",
-      "gemma3:4b-it-qat",
-      "--timeout",
-      "120000",
-      "--max-retries",
-      "3"
-    ],
-    "timeout": 300,
-  }
-```
 
 ## Usage
 
@@ -236,6 +183,50 @@ Comparing multiple images with custom prompt:
     "custom_prompt": "Compare these UI screenshots and describe the differences in color themes."
   }
 }
+```
+
+## Dev Setup
+
+1. Clone the repository:
+```bash
+git clone https://github.com/jettoblack/image_mcp.git
+cd image_mcp
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Build the project:
+```bash
+npm run build
+```
+
+4. Starting the Server
+```bash
+node build/index.js
+```
+
+The server will start and listen on stdio for MCP protocol communications.
+
+### MCP Tool Installation (local dev build)
+
+Add this to your global mcp_settings.json or project mcp.json:
+
+```json
+  "image_summarizer": {
+    "command": "node",
+    "args": [
+      "/path/to/image_mcp/build/index.js",
+      "--api-key",
+      "key",
+      "--base-url",
+      "http://localhost:9292/v1",
+      "--model",
+      "gemma3:4b-it-qat"
+    ]
+  }
 ```
 
 ## Testing
